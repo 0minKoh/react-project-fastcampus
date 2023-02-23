@@ -2,8 +2,8 @@ import './App.css';
 import './scss/App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GeoAlt, Map, Star, StarFill } from 'react-bootstrap-icons';
-import { Dropdown } from 'react-bootstrap';
-import { useState } from 'react';
+import { Dropdown, Spinner } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import {Routes, Route, useNavigate} from 'react-router-dom';
 
 function App() {
@@ -17,6 +17,8 @@ function App() {
   let [sidoEl, setSidoEl] = useState('전국');
   let [dataArr, setDataArr] = useState([]) // DataArr[i]['pm10Grade']
   let [elObj, setElObj] = useState([])
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const sidoName = ['전국', '서울', '부산', '대구', '인천', '광주', '대전', '울산', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주', '세종'];
   const getParameters = {
@@ -32,14 +34,15 @@ function App() {
     setElObj([...elObj, el])
   }
 
-  
-  fetch(`B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=${getParameters['serviceKey']}&returnType=${getParameters['returnType']}&numOfRows=${getParameters['numOfRows']}&pageNo=${getParameters['pageNo']}&sidoName=${getParameters['sidoName']}&ver=${getParameters['ver']}`
-  ).then(res => res.json()).then(data => {
-    //data['response']['body']['items'][i]['pm10Grade']
-    setDataArr(data['response']['body']['items'].slice(0, 20));
-  }).catch(e => console.log(e))
-
-
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=${getParameters['serviceKey']}&returnType=${getParameters['returnType']}&numOfRows=${getParameters['numOfRows']}&pageNo=${getParameters['pageNo']}&sidoName=${getParameters['sidoName']}&ver=${getParameters['ver']}`
+    ).then(res => res.json()).then(data => {
+      //data['response']['body']['items'][i]['pm10Grade']
+      setDataArr(data['response']['body']['items'].slice(0, 20));
+      setIsLoading(false)
+    }).catch(e => {console.log(e); setIsLoading(false)})
+  }, [sidoEl])
 
   return (
     <div className="App">
@@ -63,11 +66,16 @@ function App() {
             </Dropdown>
           </div>
           <div className="d-flex flex-wrap justify-content-center">
+            {isLoading ? (
+              <div className="loading d-flex justify-content-center align-items-center">
+                <Spinner variant='primary' size={128}></Spinner>
+              </div>
+            ): <div></div>}
             {dataArr.map((el, i) => {
               // el = each {} in []
               // stationName, pm10Value, pm10Grade, dataTime, sidoName
               return (
-                <div className={`dust-card p-3 ${(el['pm10Grade'] === '1') ? 'bg-primary' : (el['pm10Grade'] === '2') ? 'bg-success' : (el['pm10Grade'] === '3') ? 'bg-warning' : (el['pm10Grade'] === '4') ? 'bg-danger' : (el['pm10Grade'] === '5') ? 'bg-dark' : 'bg-grey'}`}
+                <div className={`dust-card p-3 ${(el['pm10Grade'] === '1') ? 'bg-primary' : (el['pm10Grade'] === '2') ? 'bg-success' : (el['pm10Grade'] === '3') ? 'bg-warning' : (el['pm10Grade'] === '4') ? 'bg-danger' : (el['pm10Grade'] === '5') ? 'bg-dark' : 'bg-secondary'}`}
                 key = {i}>
                   <div className="d-flex justify-content-between">
                     <div className="text d-flex align-items-end mb-3">
