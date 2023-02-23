@@ -37,7 +37,6 @@ function App() {
   ).then(res => res.json()).then(data => {
     //data['response']['body']['items'][i]['pm10Grade']
     setDataArr(data['response']['body']['items'].slice(0, 20));
-    console.log(dataArr)
   }).catch(e => console.log(e))
 
 
@@ -68,7 +67,7 @@ function App() {
               // el = each {} in []
               // stationName, pm10Value, pm10Grade, dataTime, sidoName
               return (
-                <div className={`dust-card p-3 ${(el['pm10Grade'] === '1') ? 'bg-primary' : (el['pm10Grade'] === '2') ? 'bg-success' : (el['pm10Grade'] === '3') ? 'bg-warning' : (el['pm10Grade'] === '4') ? 'bg-danger' : (el['pm10Grade'] === '5') ? 'bg-dark' : 'bg-gray'}`}
+                <div className={`dust-card p-3 ${(el['pm10Grade'] === '1') ? 'bg-primary' : (el['pm10Grade'] === '2') ? 'bg-success' : (el['pm10Grade'] === '3') ? 'bg-warning' : (el['pm10Grade'] === '4') ? 'bg-danger' : (el['pm10Grade'] === '5') ? 'bg-dark' : 'bg-grey'}`}
                 key = {i}>
                   <div className="d-flex justify-content-between">
                     <div className="text d-flex align-items-end mb-3">
@@ -80,7 +79,7 @@ function App() {
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className={`mb-3 text-box fs-3 bg-white p-2 rounded mx-auto ${(el['pm10Grade'] === '1') ? 'text-primary' : (el['pm10Grade'] === '2') ? 'text-success' : (el['pm10Grade'] === '3') ? 'text-warning' : (el['pm10Grade'] === '4') ? 'text-danger' : (el['pm10Grade'] === '5') ? 'text-dark' : 'text-gray'}`}>
+                    <div className={`mb-3 text-box fs-3 bg-white p-2 rounded mx-auto ${(el['pm10Grade'] === '1') ? 'text-primary' : (el['pm10Grade'] === '2') ? 'text-success' : (el['pm10Grade'] === '3') ? 'text-warning' : (el['pm10Grade'] === '4') ? 'text-danger' : (el['pm10Grade'] === '5') ? 'text-dark' : 'text-muted'}`}>
                       {(el['pm10Grade'] === '1') ? '좋음' : 
                       (el['pm10Grade'] === '2') ? '보통' :
                       (el['pm10Grade'] === '3') ? '한때나쁨' :
@@ -139,11 +138,13 @@ function MyLocation() {
 }
 
 function Pin(props) {
+  let [elObjPin, setElObjPin] = useState(props.elObj)
+
   return (
     <div className='app'>
       <div className="container">
         <div className="d-flex flex-wrap justify-content-center">
-        {props.elObj.map((el, i) => {
+        {elObjPin.map((el, i) => {
           return (
             <div className={`dust-card p-3 ${(el['pm10Grade'] === '1') ? 'bg-primary' : (el['pm10Grade'] === '2') ? 'bg-success' : (el['pm10Grade'] === '3') ? 'bg-warning' : (el['pm10Grade'] === '4') ? 'bg-danger' : (el['pm10Grade'] === '5') ? 'bg-dark' : 'bg-gray'}`} key = {i}>
               <div className="d-flex justify-content-between">
@@ -151,7 +152,11 @@ function Pin(props) {
                   <div className="fs-5 me-2">{el['stationName']}</div>
                   <div className="fs-6">{el['sidoName']}</div>
                 </div>
-                <div className="icon icon-star">
+                <div className="icon icon-star" onClick={() => {
+                  var newObjPin = [...elObjPin];
+                  newObjPin.splice(i, 1)
+                  setElObjPin(newObjPin)
+                  alert(el['stationName'] + ' 삭제 완료!');}}>
                   <StarFill color='white' size={20}/>
                 </div>
               </div>
